@@ -27,6 +27,7 @@ dependencies:
 - http-types
 - websockets
 - wai-websockets
+- wai-app-static
 
 library:
   source-dirs: src
