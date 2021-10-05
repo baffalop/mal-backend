@@ -3,13 +3,22 @@
 module Main where
 
 import Control.Monad (forever)
-import qualified Data.Text.IO as T
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Application.Static as Static
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Handler.WebSockets (websocketsOr)
 import qualified Network.WebSockets as WS
+import qualified World
+import World (DownMsg(..), UpMsg(..))
+
+port :: Int
+port = 8080
+
+publicDir :: String
+publicDir = "public/"
 
 main :: IO ()
 main = do
@@ -29,17 +38,16 @@ wsApp :: WS.ServerApp
 wsApp pending = do
   con <- WS.acceptRequest pending
   putStrLn "Accepted new connection"
-  WS.withPingThread con 30 (return ()) $ echo con
+  WS.withPingThread con 30 (return ()) $ world con
 
-echo :: WS.Connection -> IO ()
-echo con =
+world :: WS.Connection -> IO ()
+world con =
   forever $ do
     msg <- WS.receiveData con
-    T.putStrLn $ "Message received: " <> msg
-    WS.sendTextData con $ "Message received: " <> msg
-
-port :: Int
-port = 8080
-
-publicDir :: String
-publicDir = "public/"
+    LB.putStrLn $ "Message received: " <> msg
+    case Aeson.decode msg of
+      Nothing -> do
+        putStrLn "Invalid UpMsg"
+      Just (Insert index newSpan) -> do
+        putStrLn $ "Inserting new span at layer " <> show index
+        WS.sendTextData con $ Aeson.encode $ Update $ World.insert newSpan index World.new

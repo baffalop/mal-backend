@@ -22,12 +22,15 @@ description:         Please see the README on GitHub at <https://github.com/baff
 dependencies:
 - base >= 4.7 && < 5
 - text
+- bytestring
+- microlens
 - wai
 - warp
 - http-types
 - websockets
 - wai-websockets
 - wai-app-static
+- aeson
 
 library:
   source-dirs: src
