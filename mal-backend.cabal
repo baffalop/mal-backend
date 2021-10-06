@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Utils.NeqMap
       World
   other-modules:
       Paths_mal_backend
@@ -35,6 +36,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , http-types
     , microlens
     , text
@@ -56,6 +58,7 @@ executable mal-backend-exe
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , http-types
     , mal-backend
     , microlens
@@ -79,6 +82,7 @@ test-suite mal-backend-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , http-types
     , mal-backend
     , microlens
