@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      World
   other-modules:
       Paths_mal_backend
   hs-source-dirs:
@@ -47,7 +48,6 @@ library
 executable mal-backend-exe
   main-is: Main.hs
   other-modules:
-      World
       Paths_mal_backend
   hs-source-dirs:
       app
