@@ -37,6 +37,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , data-default
     , http-types
     , microlens
     , text
@@ -59,6 +60,7 @@ executable mal-backend-exe
     , base >=4.7 && <5
     , bytestring
     , containers
+    , data-default
     , http-types
     , mal-backend
     , microlens
@@ -83,6 +85,7 @@ test-suite mal-backend-test
     , base >=4.7 && <5
     , bytestring
     , containers
+    , data-default
     , http-types
     , mal-backend
     , microlens

@@ -24,6 +24,7 @@ dependencies:
 - text
 - bytestring
 - containers
+- data-default
 - microlens
 - wai
 - warp

@@ -12,6 +12,7 @@ module World
 
 import Data.Aeson as Aeson
 import Data.Char (toLower)
+import Data.Default (Default, def)
 import GHC.Generics (Generic)
 import Lens.Micro ((%~), (&), _head, ix)
 
@@ -26,19 +27,19 @@ data Span =
 
 type Layer = [Span]
 
-data Infinite a =
-  Infinite
+data Extensible a =
+  Extensible
     { _bound :: Int
     , _list :: [a]
     }
 
-instance Show a => Show (Infinite a) where
+instance Show a => Show (Extensible a) where
   show = show . bounded
 
 data World =
   World
-    { _back :: Infinite Layer
-    , _fwd :: Infinite Layer
+    { _back :: Extensible Layer
+    , _fwd :: Extensible Layer
     }
 
 instance Show World where
@@ -77,17 +78,17 @@ serialize :: World -> Serial
 serialize world =
   Serial {_origin = _bound $ _back world, _layers = (reverse $ bounded $ _back world) <> (bounded $ _fwd world)}
 
-bounded :: Infinite a -> [a]
-bounded (Infinite bound xs) = take bound xs
+bounded :: Extensible a -> [a]
+bounded (Extensible bound xs) = take bound xs
 
-empty :: Monoid a => Infinite a
-empty = Infinite 0 $ repeat mempty
+empty :: Default a => Extensible a
+empty = Extensible 0 $ repeat def
 
-singleton :: Monoid a => Infinite a
+singleton :: Default a => Extensible a
 singleton = empty {_bound = 1}
 
-updateAt :: Int -> (a -> a) -> Infinite a -> Infinite a
-updateAt index update (Infinite bound xs) = Infinite (max bound $ index + 1) (xs & ix index %~ update)
+updateAt :: Int -> (a -> a) -> Extensible a -> Extensible a
+updateAt index update (Extensible bound xs) = Extensible (max bound $ index + 1) (xs & ix index %~ update)
 
 -- JSON
 instance ToJSON Span where
