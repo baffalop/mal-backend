@@ -8,6 +8,8 @@ module World
   , insert
   , UpMsg(..)
   , DownMsg(..)
+  , Serial(..)
+  , serialize
   ) where
 
 import Data.Aeson as Aeson
@@ -50,7 +52,7 @@ data Serial =
     { _origin :: Int
     , _layers :: [Layer]
     }
-  deriving (Show, Generic)
+  deriving (Show, Generic, Eq)
 
 data UpMsg =
   Insert

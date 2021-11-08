@@ -24,6 +24,7 @@ dependencies:
 - text
 - bytestring
 - containers
+- hspec
 - data-default
 - microlens
 - wai
