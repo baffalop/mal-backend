@@ -22,7 +22,7 @@ port :: Int
 port = 8080
 
 publicDir :: String
-publicDir = "public/"
+publicDir = "frontend/dist/"
 
 main :: IO ()
 main = do
