@@ -46,7 +46,7 @@ wsApp cons world pending = do
   putStrLn "Accepted new connection"
   index <- modifyMVar cons $ pure . NeqMap.insert con
   let disconnect = putStrLn "Disconnected" >> modifyMVar_ cons (pure . NeqMap.delete index)
-  (keepAlive con $ worldApp cons con world) `finally` disconnect
+  keepAlive con (worldApp cons con world) `finally` disconnect
 
 worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
 worldApp cons con world =
@@ -63,7 +63,7 @@ worldApp cons con world =
 
 broadcast :: MVar (NeqMap WS.Connection) -> DownMsg -> IO ()
 broadcast cons msg = do
-  connections <- fmap NeqMap.toList $ readMVar cons
+  connections <- NeqMap.toList <$> readMVar cons
   forM_ connections $ flip WS.sendTextData $ Aeson.encode msg
 
 keepAlive :: WS.Connection -> IO () -> IO ()
