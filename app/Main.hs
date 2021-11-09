@@ -77,6 +77,3 @@ modifyReturnMVar var f = modifyMVar var $ pure . dup . f
 
 dup :: a -> (a, a)
 dup x = (x, x)
-
-withoutIndex :: Int -> [a] -> [a]
-withoutIndex index list = take index list ++ drop (index + 1) list
