@@ -73,12 +73,15 @@ new = World empty singleton
 insert :: Span -> Int -> World -> World
 insert newSpan index world =
   if index < 0
-    then world {_back = updateAt (-index - 1) (newSpan :) (_back world)}
-    else world {_fwd = updateAt index (newSpan :) (_fwd world)}
+    then world { _back = updateAt (-index - 1) (newSpan :) (_back world) }
+    else world { _fwd = updateAt index (newSpan :) (_fwd world) }
 
 serialize :: World -> Serial
 serialize world =
-  Serial {_origin = _bound $ _back world, _layers = (reverse $ bounded $ _back world) <> (bounded $ _fwd world)}
+  Serial
+    { _origin = _bound $ _back world
+    , _layers = (reverse $ bounded $ _back world) <> (bounded $ _fwd world)
+    }
 
 bounded :: Extensible a -> [a]
 bounded (Extensible bound xs) = take bound xs
@@ -90,7 +93,8 @@ singleton :: Default a => Extensible a
 singleton = empty {_bound = 1}
 
 updateAt :: Int -> (a -> a) -> Extensible a -> Extensible a
-updateAt index update (Extensible bound xs) = Extensible (max bound $ index + 1) (xs & ix index %~ update)
+updateAt index update (Extensible bound xs) =
+  Extensible (max bound $ index + 1) (xs & ix index %~ update)
 
 -- JSON
 instance ToJSON Span where
@@ -116,8 +120,13 @@ instance ToJSON DownMsg where
   toEncoding = Aeson.genericToEncoding msgOptions
 
 recordOptions :: Aeson.Options
-recordOptions = Aeson.defaultOptions {fieldLabelModifier = drop 1, constructorTagModifier = _head %~ toLower}
+recordOptions = Aeson.defaultOptions
+  { fieldLabelModifier = drop 1
+  , constructorTagModifier = _head %~ toLower
+  }
 
 msgOptions :: Aeson.Options
-msgOptions =
-  recordOptions {tagSingleConstructors = True, sumEncoding = Aeson.defaultTaggedObject {tagFieldName = "msg"}}
+msgOptions = recordOptions
+  { tagSingleConstructors = True
+  , sumEncoding = Aeson.defaultTaggedObject { tagFieldName = "msg" }
+  }
