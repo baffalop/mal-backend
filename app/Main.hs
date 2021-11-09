@@ -55,7 +55,9 @@ worldApp cons con world =
     LB.putStrLn $ "Message received: " <> msg
     case Aeson.decode msg of
       Nothing -> do
-        putStrLn "Invalid UpMsg"
+        LB.putStrLn $ "Invalid UpMsg: " <> msg
+        WS.sendTextData con $ Aeson.encode $ Error "Couldn't parse up msg"
+
       Just (Insert index newSpan) -> do
         putStrLn $ "Inserting new span at layer " <> show index
         newWorld <- modifyReturnMVar world $ World.insert newSpan index

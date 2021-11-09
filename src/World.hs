@@ -17,6 +17,7 @@ import Data.Char (toLower)
 import Data.Default (Default, def)
 import GHC.Generics (Generic)
 import Lens.Micro ((%~), (&), _head, ix)
+import Data.Text (Text)
 
 data Span =
   Span
@@ -61,9 +62,12 @@ data UpMsg =
     }
   deriving (Show, Generic)
 
-data DownMsg =
-  Update
+data DownMsg
+  = Update
     { _world :: World
+    }
+  | Error
+    { _errorMsg :: Text
     }
   deriving (Show, Generic)
 
