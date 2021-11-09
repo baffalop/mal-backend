@@ -34,7 +34,7 @@ main = do
 staticWithRoot :: Wai.Application
 staticWithRoot req respond =
   case Wai.rawPathInfo req of
-    "/" -> respond $ Wai.responseFile HTTP.status200 [("Content-Type", "text/html")] "public/index.html" Nothing
+    "/" -> respond $ Wai.responseFile HTTP.status200 [("Content-Type", "text/html")] (publicDir <> "index.html") Nothing
     _ -> staticApp req respond
 
 staticApp :: Wai.Application
