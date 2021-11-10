@@ -17,6 +17,7 @@ import Utils.NeqMap (NeqMap)
 import qualified Utils.NeqMap as NeqMap
 import qualified World
 import World (DownMsg(..), UpMsg(..), World)
+import Data.Function ((&))
 
 port :: Int
 port = 8080
@@ -53,7 +54,10 @@ wsApp vCons vWorld pending = do
   let disconnect = do
       putStrLn "Disconnected"
       modifyMVar_ vCons $ pure . NeqMap.delete index
-  keepAlive con (worldApp vCons con vWorld) `finally` disconnect
+
+  worldApp vCons con vWorld
+    & keepAlive con 
+    & (`finally` disconnect)
 
 worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
 worldApp vCons con vWorld =
