@@ -41,16 +41,16 @@ staticApp :: Wai.Application
 staticApp = Static.staticApp $ Static.defaultWebAppSettings publicDir
 
 wsApp :: MVar (NeqMap WS.Connection) -> MVar World -> WS.ServerApp
-wsApp cons world pending = do
+wsApp vCons vWorld pending = do
   con <- WS.acceptRequest pending
   putStrLn "Accepted new connection"
-  index <- modifyMVar cons $ pure . NeqMap.insert con
+  index <- modifyMVar vCons $ pure . NeqMap.insert con
   let disconnect :: IO ()
-      disconnect = putStrLn "Disconnected" >> modifyMVar_ cons (pure . NeqMap.delete index)
-  keepAlive con (worldApp cons con world) `finally` disconnect
+      disconnect = putStrLn "Disconnected" >> modifyMVar_ vCons (pure . NeqMap.delete index)
+  keepAlive con (worldApp vCons con vWorld) `finally` disconnect
 
 worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
-worldApp cons con world =
+worldApp vCons con vWorld =
   forever $ do
     msg <- WS.receiveData con
     LB.putStrLn $ "Message received: " <> msg
@@ -61,12 +61,12 @@ worldApp cons con world =
 
       Just (Insert index newSpan) -> do
         putStrLn $ "Inserting new span at layer " <> show index
-        newWorld <- modifyReturnMVar world $ World.insert newSpan index
-        broadcast cons $ Update newWorld
+        newWorld <- modifyReturnMVar vWorld $ World.insert newSpan index
+        broadcast vCons $ Update newWorld
 
 broadcast :: MVar (NeqMap WS.Connection) -> DownMsg -> IO ()
-broadcast cons msg = do
-  connections <- NeqMap.toList <$> readMVar cons
+broadcast vCons msg = do
+  connections <- NeqMap.toList <$> readMVar vCons
   forM_ connections $ flip WS.sendTextData $ Aeson.encode msg
 
 keepAlive :: WS.Connection -> IO () -> IO ()
