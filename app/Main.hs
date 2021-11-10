@@ -44,6 +44,11 @@ wsApp :: MVar (NeqMap WS.Connection) -> MVar World -> WS.ServerApp
 wsApp vCons vWorld pending = do
   con <- WS.acceptRequest pending
   putStrLn "Accepted new connection"
+
+  -- Establish world for new client
+  readMVar vWorld >>= WS.sendTextData con . Aeson.encode . Update
+
+  -- Manage connections
   index <- modifyMVar vCons $ pure . NeqMap.insert con
   let disconnect = do
       putStrLn "Disconnected"
