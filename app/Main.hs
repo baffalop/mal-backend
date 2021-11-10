@@ -84,6 +84,4 @@ keepAlive con = WS.withPingThread con 30 (return ())
 
 modifyReturnMVar :: MVar a -> (a -> a) -> IO a
 modifyReturnMVar var f = modifyMVar var $ pure . dup . f
-
-dup :: a -> (a, a)
-dup x = (x, x)
+  where dup x = (x, x)
