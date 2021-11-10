@@ -52,8 +52,8 @@ wsApp vCons vWorld pending = do
   -- Manage connections
   index <- modifyMVar vCons $ pure . NeqMap.insert con
   let disconnect = do
-      putStrLn "Disconnected"
-      modifyMVar_ vCons $ pure . NeqMap.delete index
+        putStrLn "Disconnected"
+        modifyMVar_ vCons $ pure . NeqMap.delete index
 
   worldApp vCons con vWorld
     & keepAlive con 
