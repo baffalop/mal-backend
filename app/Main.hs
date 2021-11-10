@@ -45,8 +45,9 @@ wsApp vCons vWorld pending = do
   con <- WS.acceptRequest pending
   putStrLn "Accepted new connection"
   index <- modifyMVar vCons $ pure . NeqMap.insert con
-  let disconnect :: IO ()
-      disconnect = putStrLn "Disconnected" >> modifyMVar_ vCons (pure . NeqMap.delete index)
+  let disconnect = do
+      putStrLn "Disconnected"
+      modifyMVar_ vCons $ pure . NeqMap.delete index
   keepAlive con (worldApp vCons con vWorld) `finally` disconnect
 
 worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
