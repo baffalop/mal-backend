@@ -30,16 +30,13 @@ main = do
   putStrLn $ "running on http://localhost:" <> show port
   world <- newMVar World.new
   clients <- newMVar (NeqMap.empty :: NeqMap WS.Connection)
-  Warp.run port $ websocketsOr WS.defaultConnectionOptions (wsApp clients world) staticWithRoot
-
-staticWithRoot :: Wai.Application
-staticWithRoot req respond =
-  case Wai.rawPathInfo req of
-    "/" -> respond $ Wai.responseFile HTTP.status200 [("Content-Type", "text/html")] (publicDir <> "index.html") Nothing
-    _ -> staticApp req respond
+  Warp.run port $ websocketsOr WS.defaultConnectionOptions (wsApp clients world) staticApp
 
 staticApp :: Wai.Application
-staticApp = Static.staticApp $ Static.defaultWebAppSettings publicDir
+staticApp req respond =
+  case Wai.rawPathInfo req of
+    "/" -> respond $ Wai.responseFile HTTP.status200 [("Content-Type", "text/html")] (publicDir <> "index.html") Nothing
+    _ -> Static.staticApp (Static.defaultWebAppSettings publicDir) req respond
 
 wsApp :: MVar (NeqMap WS.Connection) -> MVar World -> WS.ServerApp
 wsApp vCons vWorld pending = do
