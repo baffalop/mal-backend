@@ -7,6 +7,7 @@ import Control.Exception (finally)
 import Control.Monad (forM_, forever)
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy.Char8 as LB
+import Data.Function ((&))
 import qualified Network.HTTP.Types as HTTP
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Application.Static as Static
@@ -15,9 +16,8 @@ import Network.Wai.Handler.WebSockets (websocketsOr)
 import qualified Network.WebSockets as WS
 import Utils.NeqMap (NeqMap)
 import qualified Utils.NeqMap as NeqMap
+import World (DownMsg (..), UpMsg (..), World)
 import qualified World
-import World (DownMsg(..), UpMsg(..), World)
-import Data.Function ((&))
 
 port :: Int
 port = 8080

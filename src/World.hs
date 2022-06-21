@@ -15,9 +15,9 @@ module World
 import Data.Aeson as Aeson
 import Data.Char (toLower)
 import Data.Default (Default, def)
-import GHC.Generics (Generic)
-import Lens.Micro ((%~), (&), _head, ix)
 import Data.Text (Text)
+import GHC.Generics (Generic)
+import Lens.Micro (ix, (%~), (&), _head)
 
 data Span =
   Span
