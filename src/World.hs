@@ -63,12 +63,16 @@ data UpMsg =
   deriving (Show, Generic)
 
 data DownMsg
-  = Update
-    { _world :: World
-    }
+  = Establish
+      { _world :: World
+      }
+  | Update
+      { _world :: World
+      , _insertedAt :: Int
+      }
   | Error
-    { _errorMsg :: Text
-    }
+      { _errorMsg :: Text
+      }
   deriving (Show, Generic)
 
 new :: World

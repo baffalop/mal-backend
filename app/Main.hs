@@ -44,7 +44,7 @@ wsApp vCons vWorld pending = do
   putStrLn "Accepted new connection"
 
   -- Establish world for new client
-  readMVar vWorld >>= WS.sendTextData con . Aeson.encode . Update
+  readMVar vWorld >>= WS.sendTextData con . Aeson.encode . Establish
 
   -- Manage connections
   index <- modifyMVar vCons $ pure . NeqMap.insert con
@@ -53,7 +53,7 @@ wsApp vCons vWorld pending = do
         modifyMVar_ vCons $ pure . NeqMap.delete index
 
   worldApp vCons con vWorld
-    & keepAlive con 
+    & keepAlive con
     & (`finally` disconnect)
 
 worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
@@ -68,7 +68,7 @@ worldApp vCons con vWorld = forever $ do
     Just (Insert index newSpan) -> do
       putStrLn $ "Inserting new span at layer " <> show index
       newWorld <- modifyReturnMVar vWorld $ World.insert newSpan index
-      broadcast vCons $ Update newWorld
+      broadcast vCons $ Update newWorld index
 
 broadcast :: MVar (NeqMap WS.Connection) -> DownMsg -> IO ()
 broadcast vCons msg = do
@@ -80,4 +80,5 @@ keepAlive con = WS.withPingThread con 30 (return ())
 
 modifyReturnMVar :: MVar a -> (a -> a) -> IO a
 modifyReturnMVar var f = modifyMVar var $ pure . dup . f
-  where dup x = (x, x)
+  where
+    dup x = (x, x)
