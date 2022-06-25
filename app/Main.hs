@@ -52,23 +52,26 @@ wsApp vCons vWorld pending = do
         putStrLn "Disconnected"
         modifyMVar_ vCons $ pure . NeqMap.delete index
 
-  worldApp vCons con vWorld
+  worldApp vCons con index vWorld
     & keepAlive con
     & (`finally` disconnect)
 
-worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> MVar World -> IO ()
-worldApp vCons con vWorld = forever $ do
-  msg <- WS.receiveData con
-  LB.putStrLn $ "Message received: " <> msg
-  case Aeson.decode msg of
-    Nothing -> do
-      LB.putStrLn $ "Invalid UpMsg: " <> msg
-      WS.sendTextData con $ Aeson.encode $ Error "Couldn't parse up msg"
+worldApp :: MVar (NeqMap WS.Connection) -> WS.Connection -> Int -> MVar World -> IO ()
+worldApp vCons con conIndex vWorld = do
+  putStrLn ("Starting worldApp for client " <> show conIndex)
+  forever $ do
+    msg <- WS.receiveData con
+    LB.putStrLn $ "Message received from client " <> LB.pack (show conIndex) <> ": " <> msg
 
-    Just (Insert index newSpan) -> do
-      putStrLn $ "Inserting new span at layer " <> show index
-      newWorld <- modifyReturnMVar vWorld $ World.insert newSpan index
-      broadcast vCons $ Update newWorld index
+    case Aeson.decode msg of
+      Nothing -> do
+        LB.putStrLn $ "Invalid UpMsg: " <> msg
+        WS.sendTextData con $ Aeson.encode $ Error "Couldn't parse up msg"
+
+      Just (Insert index newSpan) -> do
+        putStrLn $ "Inserting new span at layer " <> show index
+        newWorld <- modifyReturnMVar vWorld $ World.insert newSpan index
+        broadcast vCons $ Update newWorld index
 
 broadcast :: MVar (NeqMap WS.Connection) -> DownMsg -> IO ()
 broadcast vCons msg = do
